@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traccar
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: traccar
+  template:
+    metadata:
+      labels:
+        app: traccar
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+      - image: gcr.io/zeta-structure-296509/github.com/adwisatya/traccar-docker@sha256:0b8bdb8f87d1c72ca599a54b622cd2daab2155592f70d8e31fac75d26780bf61
+        imagePullPolicy: Always
+        name: traccar
+        ports:
+        - containerPort: 8082
+          protocol: TCP
+        - containerPort: 5055
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/traccar/conf/traccar.xml
+          subPath: traccar-config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: traccar
